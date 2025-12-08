@@ -1,0 +1,19 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-governance-labels
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: require-team-label
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Label 'app.kubernetes.io/team' is required for auditability"
+      pattern:
+        metadata:
+          labels:
+            app.kubernetes.io/team: "?*"

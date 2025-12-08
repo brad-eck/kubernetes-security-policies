@@ -1,0 +1,46 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-ifnotpresent
+  annotations:
+    policies.kyverno.io/title: Default ImagePullPolicy + Resource Limits
+    policies.kyverno.io/description: >-
+      Sets imagePullPolicy to IfNotPresent and adds default resource limits (CIS 5.2.3, NIST SC-12)
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+  - name: default-ifnotpresent-containers
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    mutate:
+      foreach:
+      - list: "request.object.spec.containers"
+        patchStrategicMerge:
+          spec:
+            containers:
+            - (name): "{{element.name}}"
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
+      - list: "request.object.spec.initContainers"
+        patchStrategicMerge:
+          spec:
+            initContainers:
+            - (name): "{{element.name}}"
+              imagePullPolicy: IfNotPresent
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 128Mi
+                limits:
+                  cpu: 500m
+                  memory: 256Mi
