@@ -1,0 +1,22 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-approved-registries
+  annotations:
+    policies.kyverno.io/title: Require Approved Container Registries
+spec:
+  validationFailureAction: Enforce
+# kyverno-policies/advanced/require-approved-registries.yaml
+  rules:
+  - name: approved-registries
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "Only approved registries allowed (docker.io, ghcr.io, quay.io, gcr.io)"
+      pattern:
+        spec:
+          (containers|initContainers):
+          - image: "docker.io/* | ghcr.io/* | quay.io/* | gcr.io/*"

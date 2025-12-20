@@ -1,0 +1,23 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: disallow-hostpath
+  annotations:
+    policies.kyverno.io/title: Disallow HostPath Volumes
+    policies.kyverno.io/description: >-
+      Completely blocks hostPath volumes (CIS 5.2.5, NIST SC-28)
+spec:
+  validationFailureAction: Enforce
+  rules:
+  - name: block-hostpath
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    validate:
+      message: "HostPath volumes are disallowed – use ConfigMap/Secret/PVC instead"
+      pattern:
+        spec:
+          volumes:
+          - hostPath: null

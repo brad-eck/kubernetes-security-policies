@@ -1,0 +1,21 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-networkpolicy
+  annotations:
+    policies.kyverno.io/title: Require Default-Deny NetworkPolicy per Namespace
+spec:
+  validationFailureAction: Audit  # change to Enforce once you have policies in place
+  rules:
+  - name: default-deny
+    match:
+      any:
+      - resources:
+          kinds:
+          - Namespace
+    validate:
+      message: "Every namespace must have a default-deny NetworkPolicy"
+      pattern:
+        metadata:
+          annotations:
+            kyverno.io/default-deny: "true"

@@ -4,8 +4,6 @@ metadata:
   name: disallow-latest-tag
   annotations:
     policies.kyverno.io/title: Disallow :latest Image Tags
-    policies.kyverno.io/description: >-
-      Prevents use of :latest to enforce reproducible, secure deployments
 spec:
   validationFailureAction: Enforce
   background: false
@@ -17,12 +15,12 @@ spec:
           kinds:
           - Pod
     validate:
-      message: "Image tag 'latest' is disallowed. Use a immutable tag."
+      message: "Image tag 'latest' is disallowed. Use an immutable tag (e.g., :1.27)."
       pattern:
         spec:
+          =(initContainers):
+          - image: "!*:latest"
           containers:
           - image: "!*:latest"
-          initContainers:
-          - image: "!*:latest"
-          ephemeralContainers:
+          =(ephemeralContainers):
           - image: "!*:latest"

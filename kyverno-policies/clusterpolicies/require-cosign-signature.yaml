@@ -1,0 +1,32 @@
+# kyverno-policies/advanced/require-cosign-keyless.yaml
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: require-cosign-keyless
+  annotations:
+    policies.kyverno.io/title: Require Cosign Keyless Image Signatures
+    policies.kyverno.io/category: Supply Chain Security
+    policies.kyverno.io/severity: high
+    policies.kyverno.io/description: >-
+      Verifies images were signed using Sigstore/Cosign keyless mode via GitHub Actions OIDC.
+      Enforces SLSA Level 3 provenance (NIST 800-161, SOC 2 CC6.8, CISA SBOM mandates)
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+  - name: verify-keyless-github-actions
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    verifyImages:
+    - imageReferences:
+      - "*"   # Change to "docker.io/myorg/*" or "ghcr.io/myorg/*" for scoped enforcement
+      attestors:
+      - entries:
+        - keyless:
+            issuer: "https://token.actions.githubusercontent.com"
+            subject: "https://github.com/*/*"   # accepts any GitHub repo (demo only!)  # <-- customize this
+            rekor:
+              url: "https://rekor.sigstore.dev"

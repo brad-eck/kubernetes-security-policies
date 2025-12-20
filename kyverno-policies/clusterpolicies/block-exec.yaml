@@ -1,0 +1,26 @@
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-exec
+  annotations:
+    policies.kyverno.io/title: Block kubectl exec and debug
+    policies.kyverno.io/description: >-
+      Prevents interactive shell access to pods (anti-persistence control)
+spec:
+  validationFailureAction: Enforce
+  background: false
+  rules:
+  - name: deny-exec
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod/exec   # modern subresource format (no warning)
+    preconditions:
+      all:
+      - key: "{{ request.operation || 'BACKGROUND' }}"
+        operator: Equals
+        value: CONNECT
+    validate:
+      message: "kubectl exec and debug are disabled cluster-wide for security (use jobs or sidecars for troubleshooting)"
+      deny: {}

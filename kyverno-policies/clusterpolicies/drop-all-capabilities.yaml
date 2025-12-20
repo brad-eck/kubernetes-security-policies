@@ -2,15 +2,11 @@ apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
   name: drop-all-capabilities
-  annotations:
-    policies.kyverno.io/title: Drop Capabilities + RunAsNonRoot
-    policies.kyverno.io/description: >-
-      Adds drop: [ALL] and runAsNonRoot: true for defense-in-depth (CIS 5.2.8, NIST SC-7(5))
 spec:
   validationFailureAction: Enforce
   background: false
   rules:
-  - name: drop-capabilities-containers
+  - name: containers
     match:
       any:
       - resources:
@@ -18,23 +14,27 @@ spec:
           - Pod
     mutate:
       foreach:
-      - list: "request.object.spec.containers"
+      - list: "request.object.spec.containers[]"
         patchStrategicMerge:
-          spec:
-            containers:
-            - (name): "{{element.name}}"
-              securityContext:
-                runAsNonRoot: true
-                capabilities:
-                  drop:
-                  - ALL
-      - list: "request.object.spec.initContainers"
+          element:
+            securityContext:
+              runAsNonRoot: true
+              capabilities:
+                drop:
+                - ALL
+  - name: initcontainers
+    match:
+      any:
+      - resources:
+          kinds:
+          - Pod
+    mutate:
+      foreach:
+      - list: "request.object.spec.initContainers[]"
         patchStrategicMerge:
-          spec:
-            initContainers:
-            - (name): "{{element.name}}"
-              securityContext:
-                runAsNonRoot: true
-                capabilities:
-                  drop:
-                  - ALL
+          element:
+            securityContext:
+              runAsNonRoot: true
+              capabilities:
+                drop:
+                - ALL
