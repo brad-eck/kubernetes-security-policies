@@ -9,7 +9,6 @@ My personal zero-trust Kubernetes playground.
   - Block `:latest` tags
   - Require resource requests/limits and governance labels
   - Auto-mutate `imagePullPolicy: IfNotPresent`, drop ALL capabilities, force runAsNonRoot
-  - …and a bunch more coming (Cosign verification, hostPath blocking, approved registries, etc.)
 
 ## Requirements:
 - Running k8s cluster
