@@ -10,7 +10,7 @@ venv/
 
 # Reports
 ./cli/reports/*.pdf
-reports/*.html
+./cli/reports/*.html
 
 # IDE
 .vscode/
