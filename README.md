@@ -21,3 +21,8 @@ Run yourself:
 git clone https://github.com/brad-eck/kubernetes-security-policies.git
 cd kubernetes-security-policies
 kubectl apply -f ./kyverno-policies/clusterpolicies/
+
+# Test working good pod
+kubectl apply -f ./cluster/test/good-pod.yaml
+# Test bad pod. Should fail to create
+kubectl apply -f ./cluster/test/bad-pod.yaml
