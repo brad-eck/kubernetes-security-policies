@@ -1,2 +1,3 @@
 *.real.kubeconfig
 kubeconfig.yaml
+create.sh
