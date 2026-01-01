@@ -15,3 +15,5 @@ reports/*.html
 # IDE
 .vscode/
 .idea/
+
+./cli/reports/compliance_report.html
