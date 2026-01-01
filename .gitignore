@@ -9,11 +9,9 @@ venv/
 *.log
 
 # Reports
-reports/*.pdf
+./cli/reports/*.pdf
 reports/*.html
 
 # IDE
 .vscode/
 .idea/
-
-./cli/reports/compliance_report.html
