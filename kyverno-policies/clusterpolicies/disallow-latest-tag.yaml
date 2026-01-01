@@ -5,8 +5,8 @@ metadata:
   annotations:
     policies.kyverno.io/title: Disallow :latest Image Tags
 spec:
-  validationFailureAction: Enforce
-  background: false
+  validationFailureAction: Audit
+  background: true
   rules:
   - name: check-latest-tag
     match:

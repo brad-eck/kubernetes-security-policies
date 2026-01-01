@@ -7,7 +7,8 @@ metadata:
     policies.kyverno.io/description: >-
       Completely blocks hostPath volumes (CIS 5.2.5, NIST SC-28)
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: Audit
+  background: true
   rules:
   - name: block-hostpath
     match:

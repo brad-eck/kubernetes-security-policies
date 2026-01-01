@@ -3,7 +3,8 @@ kind: ClusterPolicy
 metadata:
   name: require-governance-labels
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: Audit
+  background: true
   rules:
   - name: require-team-label
     match:

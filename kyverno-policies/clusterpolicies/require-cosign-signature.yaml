@@ -11,8 +11,8 @@ metadata:
       Verifies images were signed using Sigstore/Cosign keyless mode via GitHub Actions OIDC.
       Enforces SLSA Level 3 provenance (NIST 800-161, SOC 2 CC6.8, CISA SBOM mandates)
 spec:
-  validationFailureAction: Enforce
-  background: false
+  validationFailureAction: Audit
+  background: true
   rules:
   - name: verify-keyless-github-actions
     match:
@@ -23,6 +23,7 @@ spec:
     verifyImages:
     - imageReferences:
       - "*"   # Change to "docker.io/myorg/*" or "ghcr.io/myorg/*" for scoped enforcement
+      mutateDigest: false
       attestors:
       - entries:
         - keyless:

@@ -25,3 +25,19 @@ kubectl apply -f ./kyverno-policies/clusterpolicies/
 kubectl apply -f ./cluster/test/good-pod.yaml
 # Test bad pod. Should fail to create
 kubectl apply -f ./cluster/test/bad-pod.yaml
+```
+
+## Running the Report Script:
+This Python script generates an audit-ready HTML report from Kyverno PolicyReports, showing policy status and violations mapped to compliance frameworks.
+
+```bash
+cd cli
+python3 -m venv venv
+source venv/bin/activate
+
+pip install rich
+
+./compliance_report.py
+```
+
+The report is saved to reports/compliance_report.html — open it in your browser.

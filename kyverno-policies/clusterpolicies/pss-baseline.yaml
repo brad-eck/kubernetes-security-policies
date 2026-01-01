@@ -10,7 +10,7 @@ metadata:
       Enforces the official Kubernetes Pod Security Standards Baseline profile.
       Handles missing fields correctly – no false positives on clean pods.
 spec:
-  validationFailureAction: Enforce
+  validationFailureAction: Audit
   background: true
   rules:
   - name: baseline

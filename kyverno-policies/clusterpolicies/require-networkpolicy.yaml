@@ -6,6 +6,7 @@ metadata:
     policies.kyverno.io/title: Require Default-Deny NetworkPolicy per Namespace
 spec:
   validationFailureAction: Audit  # change to Enforce once you have policies in place
+  background: true
   rules:
   - name: default-deny
     match:

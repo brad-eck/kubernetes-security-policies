@@ -5,8 +5,8 @@ metadata:
   annotations:
     policies.kyverno.io/title: Require Approved Container Registries
 spec:
-  validationFailureAction: Enforce
-# kyverno-policies/advanced/require-approved-registries.yaml
+  validationFailureAction: Audit
+  background: true
   rules:
   - name: approved-registries
     match:

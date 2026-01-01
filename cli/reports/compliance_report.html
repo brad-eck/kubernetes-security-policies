@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+.r1 {font-weight: bold}
+.r2 {color: #008080; text-decoration-color: #008080; font-weight: bold}
+.r3 {color: #00ff00; text-decoration-color: #00ff00; font-weight: bold}
+.r4 {font-style: italic}
+.r5 {color: #008000; text-decoration-color: #008000}
+.r6 {color: #800000; text-decoration-color: #800000}
+body {
+    color: #000000;
+    background-color: #ffffff;
+}
+</style>
+</head>
+<body>
+    <pre style="font-family:Menlo,'DejaVu Sans Mono',consolas,'Courier New',monospace"><code style="font-family:inherit">┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃                                                                                                                                        <span class="r1">Kubernetes Security Compliance Report</span>                                                                                                                                        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+Generated: <span class="r2">2026</span>-<span class="r2">01</span>-<span class="r2">01</span> <span class="r3">15:59:47</span>
+Cluster: dev-server.ble.sys
+
+<span class="r4">                         Kyverno Policy Compliance Status (Aggregated)                         </span>
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃<span class="r1"> Policy Name                 </span>┃<span class="r1"> Status </span>┃<span class="r1"> Total Violations </span>┃<span class="r1"> Compliance Mapping                </span>┃
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
+│ block-exec                  │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ disallow-hostpath           │ <span class="r6">FAIL</span>   │ 17               │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ disallow-latest-tag         │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ drop-all-capabilities       │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ pss-baseline                │ <span class="r6">FAIL</span>   │ 5                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-approved-registries │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-cosign-keyless      │ <span class="r6">FAIL</span>   │ 71               │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-governance-labels   │ <span class="r6">FAIL</span>   │ 71               │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-ifnotpresent        │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-networkpolicy       │ <span class="r5">PASS</span>   │ 0                │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+│ require-resource-limits     │ <span class="r6">FAIL</span>   │ 68               │ CIS 5.x / NIST SC-7 / SOC 2 CC6.1 │
+└─────────────────────────────┴────────┴──────────────────┴───────────────────────────────────┘
+
+<span class="r1">Summary:</span> <span class="r2">6</span> passing, <span class="r2">5</span> failing out of <span class="r2">11</span> policies
+
+<span class="r1">Note for auditors:</span> In Enforce mode, non-compliant resources are blocked at admission and do not generate reports. In Audit mode with background scanning, violations are logged for existing resources. Zero violations = effective preventive controls.
+</code></pre>
+</body>
+</html>
