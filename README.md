@@ -10,6 +10,7 @@ personal reasons as well as professional.
   - Block `:latest` tags
   - Require resource requests/limits and governance labels
   - Auto-mutate `imagePullPolicy: IfNotPresent`, drop ALL capabilities, force runAsNonRoot
+  - Require cosign keyless image signatures
 
 ## Requirements:
 - Running k8s cluster
