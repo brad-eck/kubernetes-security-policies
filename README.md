@@ -1,6 +1,7 @@
 # kubernetes-security-policies
 
-My personal zero-trust Kubernetes playground.
+My personal zero-trust Kubernetes playground. I wanted to establish a policy engine for my personal k3s cluster for 
+personal reasons as well as professional.
 
 ## What’s actually in here right now
 
