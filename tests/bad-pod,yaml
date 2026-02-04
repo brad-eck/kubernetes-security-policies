@@ -1,18 +1,40 @@
-# This pod should fail if policies have been configured
+---
+# bad-pod.yaml - A deliberately insecure pod that violates multiple policies
+#
+# This pod should FAIL and be BLOCKED by Kyverno policies.
 
 apiVersion: v1
 kind: Pod
 metadata:
   name: insecure-pod
+  labels:
+    app: bad-app
 spec:
-  hostNetwork: true  # Violates: no host network
-  hostPID: true      # Violates: no host PID
+  hostNetwork: true
+  
+  hostPID: true
+  
+  hostIPC: true
+  
   containers:
   - name: bad-container
-    image: alpine:latest  # Violates: no :latest tags
-    # Missing: resource limits
-    # Missing: governance labels
+    image: alpine:latest    
+    
     securityContext:
-      privileged: true    # Violates: no privileged
+      privileged: true
+      
+      allowPrivilegeEscalation: true
+      
+      runAsUser: 0
+      
       capabilities:
-        add: ["SYS_ADMIN"]  # Violates: dangerous capabilities
+        add:
+          - SYS_ADMIN
+          - NET_ADMIN
+          - SYS_PTRACE
+          - SYS_MODULE
+    
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do sleep 30; done"]
+  
+  automountServiceAccountToken: true
