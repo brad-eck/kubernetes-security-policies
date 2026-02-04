@@ -1,0 +1,18 @@
+# This pod should fail if policies have been configured
+
+apiVersion: v1
+kind: Pod
+metadata:
+  name: insecure-pod
+spec:
+  hostNetwork: true  # Violates: no host network
+  hostPID: true      # Violates: no host PID
+  containers:
+  - name: bad-container
+    image: alpine:latest  # Violates: no :latest tags
+    # Missing: resource limits
+    # Missing: governance labels
+    securityContext:
+      privileged: true    # Violates: no privileged
+      capabilities:
+        add: ["SYS_ADMIN"]  # Violates: dangerous capabilities
