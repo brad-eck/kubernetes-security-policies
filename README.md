@@ -19,10 +19,13 @@ This project provides a comprehensive security policy framework using Kyverno, a
 ```
 .
 ├── kyverno-policies/
-│   └── clusterpolicies/          # Kyverno ClusterPolicy definitions
+│   └── clusterpolicies/           # Kyverno ClusterPolicy definitions
 ├── cli/                           # Compliance reporting tools
 ├── cluster/
 │   └── test/                      # Test pod manifests (good/bad examples)
+│     └── bad-pod.yaml             # Bad pod example
+|     └── good-pod.yaml            # Good pod example
+|     └── test-policies.py         # Test script for pod deployments
 ├── ARCHITECTURE.md                # System design documentation
 ├── COMPLIANCE_MAPPING.md          # Policy-to-framework mapping
 └── README.md
