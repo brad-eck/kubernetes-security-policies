@@ -124,7 +124,7 @@ kubectl apply -f ./cluster/test/bad-pod.yaml
 
 ## Compliance Reporting
 
-The repository includes a Python CLI tool that generates audit-ready HTML reports from Kyverno PolicyReports, and a Python script that tests pod examples that can be found in /tests.
+The repository includes a Python CLI tool that generates audit-ready HTML reports from Kyverno PolicyReports, and a Python script that tests pod examples that can be found in `/tests`.
 
 ### Setup
 
