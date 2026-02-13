@@ -22,7 +22,7 @@ This project provides a comprehensive security policy framework using Kyverno, a
 │   └── clusterpolicies/           # Kyverno ClusterPolicy definitions
 ├── cli/                           # Compliance reporting tools
 ├── cluster/
-│   └── test/                      # Test pod manifests (good/bad examples)
+│   └── tests/                      # Test pod manifests (good/bad examples)
 │     └── bad-pod.yaml             # Bad pod example
 |     └── good-pod.yaml            # Good pod example
 |     └── test-policies.py         # Test script for pod deployments
@@ -124,7 +124,7 @@ kubectl apply -f ./cluster/test/bad-pod.yaml
 
 ## Compliance Reporting
 
-The repository includes a Python CLI tool that generates audit-ready HTML reports from Kyverno PolicyReports.
+The repository includes a Python CLI tool that generates audit-ready HTML reports from Kyverno PolicyReports, and a Python script that tests pod examples that can be found in /tests.
 
 ### Setup
 
