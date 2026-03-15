@@ -1,0 +1,82 @@
+# Namespace-Scoped RoleBindings
+# ClusterRole = what, RoleBinding = who + where.
+# To onboard a new namespace, copy bindings and update the namespace field.
+
+# PRODUCTION NAMESPACE
+
+# Namespace admin — platform team.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: namespace-admin-binding
+  namespace: production
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: namespace-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-namespace-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: platform-team
+
+---
+# Developers — deploy and debug, no secrets or RBAC.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-binding
+  namespace: production
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: developer
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-developer
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: backend-developers
+
+---
+# CI/CD deployer.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: ci-deployer-binding
+  namespace: production
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: ci-cd
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-ci-deployer
+subjects:
+- kind: ServiceAccount
+  name: ci-deploy
+  namespace: production
+
+---
+# STAGING NAMESPACE
+
+# Developers get namespace-admin here for broader testing access.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: developer-staging-binding
+  namespace: staging
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: namespace-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-namespace-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: backend-developers

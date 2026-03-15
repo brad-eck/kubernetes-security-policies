@@ -1,5 +1,5 @@
 ---
-# good-pod.yaml - A fully compliant pod that passes all security policies
+# good-pod.yaml — should pass all Kyverno policies.
 
 apiVersion: v1
 kind: Pod

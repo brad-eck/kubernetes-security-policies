@@ -1,7 +1,5 @@
 ---
-# bad-pod.yaml - A deliberately insecure pod that violates multiple policies
-#
-# This pod should FAIL and be BLOCKED by Kyverno policies.
+# bad-pod.yaml — should be blocked by Kyverno policies.
 
 apiVersion: v1
 kind: Pod

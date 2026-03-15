@@ -1,0 +1,74 @@
+# ClusterRoleBindings
+# Humans bound via IdP groups, service accounts bound directly.
+# No references to built-in cluster-admin.
+
+# CLUSTER ADMIN — break-glass only
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-cluster-admin-binding
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: cluster-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-cluster-admin
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: platform-admins           # IdP group — keep membership minimal
+
+---
+# MONITORING
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-monitoring-binding
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-monitoring
+subjects:
+- kind: ServiceAccount
+  name: monitoring-agent
+  namespace: monitoring
+
+---
+# LOG COLLECTOR
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-log-collector-binding
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: monitoring
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-log-collector
+subjects:
+- kind: ServiceAccount
+  name: log-collector
+  namespace: monitoring
+
+---
+# SECURITY AUDITOR
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: security-auditor-binding
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: auditor
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: security-auditor
+subjects:
+- apiGroup: rbac.authorization.k8s.io
+  kind: Group
+  name: security-team              # IdP group for security engineers

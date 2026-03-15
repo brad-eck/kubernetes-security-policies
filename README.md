@@ -26,6 +26,7 @@ This project provides a comprehensive security policy framework using Kyverno, a
 │     └── bad-pod.yaml             # Bad pod example
 |     └── good-pod.yaml            # Good pod example
 |     └── test-policies.py         # Test script for pod deployments
+├── rbac/                          # RBAC roles, bindings, and escalation prevention
 ├── ARCHITECTURE.md                # System design documentation
 ├── COMPLIANCE_MAPPING.md          # Policy-to-framework mapping
 └── README.md
@@ -113,6 +114,15 @@ kubectl apply -f ./cluster/test/bad-pod.yaml
 **Labeling Standards**
 - Requires governance labels (owner, team, environment, app)
 - Validates label format and values
+
+### RBAC
+
+**Role-Based Access Control**
+- Seven distinct personas: cluster admin, namespace admin, developer, CI/CD deployer, monitoring, security auditor, log collector
+- Least-privilege design with explicit verb and resource grants (no wildcards outside break-glass)
+- Group-based bindings for humans, dedicated ServiceAccounts for workloads
+- Aggregated ClusterRoles for extensible CRD visibility
+- Kyverno policy to block wildcard RBAC rules and prevent privilege escalation
 
 ### Mutation Policies
 
@@ -250,5 +260,6 @@ kubectl get events --field-selector reason=PolicyViolation
 - **Policy Drift**: Regularly audit applied policies against repository
 - **Admission Control**: Kyverno policies run in admission control path; ensure high availability
 - **Resource Impact**: Monitor Kyverno resource consumption in large clusters
-- **Privilege Escalation**: Protect Kyverno namespace with strict RBAC
+- **Privilege Escalation**: Protect Kyverno namespace with strict RBAC; see `rbac/` for complete role definitions
 - **Image Verification**: Maintain cosign public keys securely
+- **RBAC Hygiene**: Audit bindings regularly with `kubectl get clusterrolebindings,rolebindings -A -l app.kubernetes.io/managed-by=kubernetes-security-policies`

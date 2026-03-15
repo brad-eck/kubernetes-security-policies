@@ -16,6 +16,10 @@ The goal is to demonstrate how the enforced controls reduce operational burden w
 | disallow-hostpath                  | Completely blocks hostPath volumes               | 5.2.5                    | SC-28           | CC6.1              | A.12.4.1       | 6.5.10        | -           |
 | block-exec                         | Blocks kubectl exec/debug into pods              | 5.1.6                    | AC-3            | CC6.8              | A.9.4.4        | 7.2.3         | -           |
 | require-cosign-keyless             | Requires Sigstore/Cosign keyless signatures      | -                        | SI-7(1), SA-22  | CC7.1              | A.12.2.1       | 6.3.7         | -           |
+| rbac-least-privilege               | Persona-based roles with minimum required verbs  | 5.1.1, 5.1.5, 5.1.8     | AC-6, AC-6(1)   | CC6.1, CC6.3       | A.9.1.2        | 7.1.1, 7.1.2  | Art. 25     |
+| rbac-service-accounts              | Dedicated SAs with automount disabled by default  | 5.1.2, 5.1.5            | AC-6(5)         | CC6.1              | A.9.2.3        | 7.2.1         | -           |
+| block-wildcard-rbac                | Blocks wildcard (*) verbs/resources in RBAC rules | 5.1.3                   | AC-6(10)        | CC6.1, CC6.3       | A.9.4.1        | 7.1.2         | -           |
+| rbac-escalation-prevention         | Prevents self-provisioning of RBAC permissions   | 5.1.6, 5.1.8            | AC-6(2)         | CC6.8              | A.9.2.5        | 7.2.2         | Art. 32     |
 
 ### Notes
 

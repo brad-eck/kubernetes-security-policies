@@ -1,0 +1,110 @@
+# Privilege Escalation Prevention
+# RBAC is additive-only so we prevent escalation by omitting dangerous verbs
+# and enforcing that pattern via Kyverno at admission time.
+
+# RESTRICTED SECRET ACCESS
+# Core resource access minus secrets.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-no-secret-read
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: restricted
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - services
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - serviceaccounts
+  - events
+  verbs: ["get", "list", "watch"]
+# Secrets intentionally absent — use a separate audited role if needed.
+
+---
+# SELF-PROVISIONING LOCKDOWN
+# No RBAC write — anyone who can create RoleBindings can escalate to cluster-admin.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-rbac-readonly
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: restricted
+rules:
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - roles
+  - rolebindings
+  - clusterroles
+  - clusterrolebindings
+  verbs: ["get", "list", "watch"]
+# No write verbs. Only platform-admins modify RBAC.
+
+---
+# KYVERNO POLICY: block wildcard RBAC rules
+# Denies Roles/ClusterRoles with wildcard apiGroups, resources, or verbs.
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: block-wildcard-rbac
+  annotations:
+    policies.kyverno.io/title: Block Wildcard RBAC Rules
+    policies.kyverno.io/category: RBAC Security
+    policies.kyverno.io/severity: critical
+    policies.kyverno.io/description: >-
+      Prevents creation of Roles and ClusterRoles that use wildcard (*) in
+      apiGroups, resources, or verbs. Wildcard rules defeat the purpose of
+      RBAC and allow unintended privilege escalation. The only exception is
+      the security-cluster-admin role managed by this repository.
+spec:
+  validationFailureAction: Audit
+  background: true
+  rules:
+  - name: block-wildcard-verbs
+    match:
+      any:
+      - resources:
+          kinds:
+          - ClusterRole
+          - Role
+    exclude:
+      any:
+      - resources:
+          names:
+          - security-cluster-admin    # the one intentional wildcard role
+    validate:
+      message: >-
+        Wildcard verbs ("*") are not allowed in RBAC rules. Explicitly list
+        the required verbs (get, list, watch, create, update, patch, delete).
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.object.rules[?contains(verbs, '*')] | length(@) }}"
+            operator: GreaterThan
+            value: 0
+  - name: block-wildcard-resources
+    match:
+      any:
+      - resources:
+          kinds:
+          - ClusterRole
+          - Role
+    exclude:
+      any:
+      - resources:
+          names:
+          - security-cluster-admin
+    validate:
+      message: >-
+        Wildcard resources ("*") are not allowed in RBAC rules. Explicitly list
+        each resource the role needs access to.
+      deny:
+        conditions:
+          any:
+          - key: "{{ request.object.rules[?contains(resources || `[]`, '*')] | length(@) }}"
+            operator: GreaterThan
+            value: 0

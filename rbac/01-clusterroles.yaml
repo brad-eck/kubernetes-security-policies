@@ -1,0 +1,346 @@
+# ClusterRoles
+# One role per persona, least-privilege scoped.
+
+# CLUSTER ADMIN (break-glass)
+# Emergency use only — gate behind approval workflow in prod.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-cluster-admin
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: cluster-admin
+rules:
+- apiGroups: ["*"]
+  resources: ["*"]
+  verbs: ["*"]
+- nonResourceURLs: ["*"]
+  verbs: ["*"]
+
+---
+# NAMESPACE ADMIN
+# Full namespace control, no cluster-level power.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-namespace-admin
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: namespace-admin
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - services
+  - configmaps
+  - secrets
+  - persistentvolumeclaims
+  - serviceaccounts
+  - endpoints
+  - replicationcontrollers
+  verbs: ["*"]
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - daemonsets
+  - statefulsets
+  - replicasets
+  verbs: ["*"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["*"]
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - networkpolicies
+  - ingresses
+  verbs: ["*"]
+- apiGroups: ["autoscaling"]
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["*"]
+- apiGroups: ["policy"]
+  resources:
+  - poddisruptionbudgets
+  verbs: ["*"]
+# Subresource access for debugging.
+- apiGroups: [""]
+  resources:
+  - pods/log
+  - pods/portforward
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources:
+  - pods/exec
+  verbs: ["create"]
+# RBAC read-only — can audit bindings but not escalate.
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - roles
+  - rolebindings
+  verbs: ["get", "list", "watch"]
+
+---
+# DEVELOPER
+# Workload management + read. No Secrets, RBAC, or NetworkPolicy access.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-developer
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: developer
+rules:
+# Deploy, scale, rollback.
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - deployments/scale
+  - replicasets
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["get", "list", "watch", "create", "delete"]
+# Pods — view and delete stuck pods. No direct create (use Deployments).
+- apiGroups: [""]
+  resources:
+  - pods
+  verbs: ["get", "list", "watch", "delete"]
+- apiGroups: [""]
+  resources:
+  - pods/log
+  verbs: ["get", "list"]
+# ConfigMaps — non-sensitive config, full access.
+- apiGroups: [""]
+  resources:
+  - configmaps
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+# Services and endpoints — read-only.
+- apiGroups: [""]
+  resources:
+  - services
+  - endpoints
+  verbs: ["get", "list", "watch"]
+# Events — read-only.
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["get", "list", "watch"]
+# HPAs.
+- apiGroups: ["autoscaling"]
+  resources:
+  - horizontalpodautoscalers
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+
+---
+# CI/CD DEPLOYER
+# Create/update workloads, no exec, no secret reads, no RBAC.
+# Bound to the ci-deploy ServiceAccount.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-ci-deployer
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: ci-cd
+rules:
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - daemonsets
+  - statefulsets
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources:
+  - services
+  - configmaps
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs: ["create", "update", "patch"]   # push only — reads come from CI vault
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  verbs: ["get", "list", "watch", "create", "delete"]
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - ingresses
+  verbs: ["get", "list", "watch", "create", "update", "patch"]
+# Rollout status.
+- apiGroups: ["apps"]
+  resources:
+  - deployments/status
+  - daemonsets/status
+  - statefulsets/status
+  verbs: ["get", "list", "watch"]
+# Pod health checks during deploys.
+- apiGroups: [""]
+  resources:
+  - pods
+  - pods/log
+  verbs: ["get", "list", "watch"]
+
+---
+# MONITORING / OBSERVABILITY
+# Read-only cluster-wide + metrics scraping. For Prometheus, Grafana, etc.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-monitoring
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: monitoring
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - nodes
+  - services
+  - endpoints
+  - namespaces
+  - configmaps
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - daemonsets
+  - statefulsets
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - ingresses
+  - networkpolicies
+  verbs: ["get", "list", "watch"]
+# Metrics endpoints.
+- nonResourceURLs:
+  - /metrics
+  - /healthz
+  - /readyz
+  - /livez
+  verbs: ["get"]
+# metrics-server.
+- apiGroups: ["metrics.k8s.io"]
+  resources:
+  - pods
+  - nodes
+  verbs: ["get", "list"]
+
+---
+# SECURITY AUDITOR
+# Read-only cluster-wide. Secrets list only (no data), full RBAC + policy visibility.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-auditor
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: auditor
+rules:
+# Core resources.
+- apiGroups: [""]
+  resources:
+  - pods
+  - services
+  - configmaps
+  - endpoints
+  - persistentvolumeclaims
+  - persistentvolumes
+  - namespaces
+  - nodes
+  - serviceaccounts
+  - resourcequotas
+  - limitranges
+  - replicationcontrollers
+  verbs: ["get", "list", "watch"]
+# Secrets — list/metadata only, no data reads.
+- apiGroups: [""]
+  resources:
+  - secrets
+  verbs: ["list"]
+# Workloads.
+- apiGroups: ["apps"]
+  resources:
+  - deployments
+  - daemonsets
+  - statefulsets
+  - replicasets
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["batch"]
+  resources:
+  - jobs
+  - cronjobs
+  verbs: ["get", "list", "watch"]
+# Networking.
+- apiGroups: ["networking.k8s.io"]
+  resources:
+  - networkpolicies
+  - ingresses
+  - ingressclasses
+  verbs: ["get", "list", "watch"]
+# RBAC — review all bindings and roles.
+- apiGroups: ["rbac.authorization.k8s.io"]
+  resources:
+  - clusterroles
+  - clusterrolebindings
+  - roles
+  - rolebindings
+  verbs: ["get", "list", "watch"]
+# Kyverno policies and reports.
+- apiGroups: ["kyverno.io"]
+  resources:
+  - clusterpolicies
+  - policies
+  - policyexceptions
+  verbs: ["get", "list", "watch"]
+- apiGroups: ["wgpolicyk8s.io"]
+  resources:
+  - policyreports
+  - clusterpolicyreports
+  verbs: ["get", "list", "watch"]
+# Events.
+- apiGroups: [""]
+  resources:
+  - events
+  verbs: ["get", "list", "watch"]
+# Pod logs.
+- apiGroups: [""]
+  resources:
+  - pods/log
+  verbs: ["get", "list"]
+# Health and version endpoints.
+- nonResourceURLs:
+  - /healthz
+  - /readyz
+  - /version
+  verbs: ["get"]
+
+---
+# LOG COLLECTOR
+# Minimal read for Fluentd / Fluent Bit / Vector — pods + logs only.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: security-log-collector
+  labels:
+    app.kubernetes.io/managed-by: kubernetes-security-policies
+    rbac.security/persona: monitoring
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - namespaces
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources:
+  - pods/log
+  verbs: ["get", "list"]
